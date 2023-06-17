@@ -1,6 +1,6 @@
 
-include <../BOSL/constants.scad>
-use <../BOSL/threading.scad>
+include <./BOSL/constants.scad>
+use <./BOSL/threading.scad>
 
 spool_diameter = 72;
 spool_thickness = 62;
