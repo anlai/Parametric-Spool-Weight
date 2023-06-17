@@ -9,11 +9,13 @@ label = "";
 
 /* [Hidden] */
 weight_diamater = 14.5;
-weight_height = 55.5;
+weight_height = 50.5;
 wall_thickness = 2;
 cap_diameter_add = 15;
 thread_diamater = spool_diameter - (2*wall_thickness);
-thread_height = spool_thickness - weight_height - wall_thickness;
+// thread_height = spool_thickness - weight_height - wall_thickness;
+
+weight_height_offset = (spool_thickness-weight_height)/2;
 
 function circle_xy(radius,theta) = [radius*sin(theta),radius*cos(theta)];
 
@@ -23,7 +25,7 @@ module weight() {
 }
 
 module weights() {
-    translate([0,0,wall_thickness]) {
+    translate([0,0,weight_height_offset]) {
         weight();
 
         radius = spool_diameter/4+weight_diamater/4;
@@ -33,15 +35,6 @@ module weights() {
             coord = circle_xy(radius,angle);
             translate([coord.x,coord.y,0]) weight();
         }
-    }
-}
-
-module container() {
-    difference() {
-        cylinder(d=spool_diameter,h=spool_thickness,$fn=360,center=true);
-
-        translate([0,0,weight_height/2+spool_thickness/2])
-        cylinder(d=spool_diameter-wall_thickness,h=spool_thickness,$fn=360,center=true);
     }
 }
 
@@ -69,35 +62,41 @@ module cap_edging(num_circles,circle_radius,grip_diameter) {
 module body() {
     // body + inner thread
     difference() {
+        // outer body
         cylinder(d=spool_diameter,h=spool_thickness,$fn=360,center=false);
 
-        translate([0,0,(wall_thickness+weight_height)])
-        cylinder(d=spool_diameter-wall_thickness,h=spool_thickness,$fn=360,center=false);
+        // top cavity for the threads
+        translate([0,0,weight_height_offset+weight_height])
+        cylinder(d=spool_diameter-wall_thickness,h=weight_height_offset,$fn=360,center=false);
 
         weights();
     }
 
-    translate([0,0,weight_height+2*wall_thickness])
+    // threads
+    // note: threads are centered on the z-axis, so it has to be raised an additional half the offset
+    translate([0,0,weight_height_offset+weight_height+weight_height_offset/2])
     intersection() {
-        cylinder(d=spool_diameter-wall_thickness,h=thread_height,$fn=360,center=true);
-        threaded_nut(od=thread_diamater+5,id=thread_diamater,h=thread_height,pitch=1.25,left_handed=false,slop=0.2,$fa=1,$fs=1);
+        cylinder(d=spool_diameter-wall_thickness,h=weight_height_offset,$fn=360,center=true);
+        threaded_nut(od=thread_diamater+5,id=thread_diamater,h=weight_height_offset,pitch=1.25,left_handed=false,slop=0.2,$fa=1,$fs=1);
     }
 
+    // end cap, top aligns with z = 0
     rotate([180,0,0])
     endcap();
 }
 
 module cap() {
-    difference()
-    {
-        translate([0,0,thread_height/2])
+    difference() {
+        // the outer threads
+        translate([0,0,weight_height_offset/2])
         intersection(){
-            cylinder(d=spool_diameter,h=thread_height,$fn=360,center=true);
-            threaded_rod(d=thread_diamater-.4, l=thread_height, pitch=1.25, left_handed=false, $fa=1, $fs=1);
+            cylinder(d=spool_diameter,h=weight_height_offset,$fn=360,center=true);
+            threaded_rod(d=thread_diamater-.4, l=weight_height_offset, pitch=1.25, left_handed=false, $fa=1, $fs=1);
         }
 
-        translate([0,0,wall_thickness+.5*thread_height])
-        cylinder(d=thread_diamater-4,h=thread_height+5,$fn=360);
+        // carve out the center of the cap
+        translate([0,0,wall_thickness])
+        cylinder(d=thread_diamater-2*wall_thickness,h=weight_height_offset,$fn=360);        
     }
 
     rotate([180,0,0])
