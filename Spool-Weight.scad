@@ -2,33 +2,44 @@
 include <./BOSL/constants.scad>
 use <./BOSL/threading.scad>
 
+// diameter of inside of the spool
 spool_diameter = 72;
+
+// thickness of the inside of the spool
 spool_thickness = 62;
+
+// # of weight cavities, created with a center and weights circling
 num_weights = 7; // [1,3,5,7,9]
+
+// label to embed on the end caps
 label = "";
 
-/* [Hidden] */
-weight_diamater = 14.5;
+// diameter of the weight(s)
+weight_diameter = 14.5;
+
+// height of the weight(s)
 weight_height = 50.5;
+
+/* [Hidden] */
 wall_thickness = 2;
 cap_diameter_add = 15;
 thread_diamater = spool_diameter - (2*wall_thickness);
-// thread_height = spool_thickness - weight_height - wall_thickness;
-
+// from the edge of container to edge of weights
+// when weights are centered in the container
 weight_height_offset = (spool_thickness-weight_height)/2;
 
 function circle_xy(radius,theta) = [radius*sin(theta),radius*cos(theta)];
 
 module weight() {
     translate([0,0,weight_height/2])
-    cylinder(d=weight_diamater,h=weight_height,$fn=360,center=true);    
+    cylinder(d=weight_diameter,h=weight_height,$fn=360,center=true);    
 }
 
 module weights() {
     translate([0,0,weight_height_offset]) {
         weight();
 
-        radius = spool_diameter/4+weight_diamater/4;
+        radius = spool_diameter/4+weight_diameter/4;
         diff_angle = 360/(num_weights-1);
         for(slice=[1:num_weights-1]) {
             angle = diff_angle*slice;
