@@ -1,0 +1,21 @@
+{
+    "fileFormatVersion": "1",
+    "parameterSets": {
+        "Sunlu-AA-Batteries": {
+            "label": "Sunlu",
+            "num_weights": "7",
+            "spool_diameter": "72",
+            "spool_thickness": "62",
+            "weight_diameter": "14.5",
+            "weight_height": "50.5"
+        },
+        "Bambu-AA-Batteries": {
+            "label": "Bambu",
+            "num_weights": "7",
+            "spool_diameter": "55",
+            "spool_thickness": "63",
+            "weight_diameter": "14.5",
+            "weight_height": "50.5"
+        }
+    }
+}

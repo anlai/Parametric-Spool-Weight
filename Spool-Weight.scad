@@ -23,6 +23,8 @@ weight_height = 50.5;
 /* [Hidden] */
 wall_thickness = 2;
 cap_diameter_add = 15;
+cap_grip_diameter = 5;
+cap_diameter = spool_diameter+cap_diameter_add-cap_grip_diameter/2;
 thread_diamater = spool_diameter - (2*wall_thickness);
 // from the edge of container to edge of weights
 // when weights are centered in the container
@@ -50,10 +52,8 @@ module weights() {
 }
 
 module endcap() {
-    grip_diameter = 5;
-    cap_diameter = spool_diameter+cap_diameter_add-grip_diameter/2;
     cylinder(d=cap_diameter, h=wall_thickness, $fn=360);    
-    cap_edging(50,cap_diameter/2,grip_diameter);
+    cap_edging(50,cap_diameter/2,cap_grip_diameter);
 
     translate([0,0,wall_thickness])
     linear_extrude(.01)
@@ -116,4 +116,4 @@ module cap() {
 
 body();
 
-translate([95,0,0]) cap();
+translate([cap_diameter+8,0,0]) cap();
