@@ -20,6 +20,8 @@ weight_diameter = 14.5;
 // height of the weight(s)
 weight_height = 50.5;
 
+lid_with_rim = true;
+
 /* [Hidden] */
 wall_thickness = 2;
 cap_diameter_add = 15;
@@ -106,12 +108,25 @@ module cap() {
         }
 
         // carve out the center of the cap
-        translate([0,0,wall_thickness])
+        cap_thickness = lid_with_rim ? wall_thickness : 2*wall_thickness;
+        translate([0,0,cap_thickness])
         cylinder(d=thread_diamater-2*wall_thickness,h=weight_height_offset,$fn=360);        
+
+        if (!lid_with_rim) {
+            scale([1,1,.1]) 
+            sphere(d=thread_diamater-2*wall_thickness);
+        }
     }
 
-    rotate([180,0,0])
-    endcap();
+    if (lid_with_rim) {
+        rotate([180,0,0])
+        endcap();
+    }
+    else
+    {
+        translate([0,0,1])
+        cube([thread_diamater-2*wall_thickness,4,2],center=true);
+    }
 }
 
 body();
