@@ -86,6 +86,11 @@ $outputPath = [System.IO.Path]::GetFullPath($global:pathRoot + "\output\" + $out
 
 New-Item -ItemType Directory -Force -Path $outputFolder
 
+if (Test-Path -Path $outputPath)
+{
+    Remove-Item -Path $outputPath
+}
+
 Write-Host "Order of files to compile:"
 foreach ($dep in $dependencies)
 {
@@ -93,4 +98,4 @@ foreach ($dep in $dependencies)
     Concat-ScadFile $dep $outputPath
 }
 
-Write-Host "Done.  Written to " + $outputPath
+Write-Host "Done.  Written to " $outputPath
