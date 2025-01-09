@@ -1,7 +1,7 @@
 
 param (
     [string] $filename,
-    [string] $output = "./output.scad"
+    [string] $output = "Spool-Weight"
 )
 
 Write-Host "Compiling file:" $filename
@@ -79,8 +79,12 @@ function Concat-ScadFile {
 
 $dependencies = Discover-Dependencies $filename
 $dependencies += [System.IO.Path]::GetFullPath($global:pathRoot + "\" + $filename)
-$outputPath = [System.IO.Path]::GetFullPath($global:pathRoot + "\" + $output)
-Clear-Content -Path $outputPath
+
+$dateTag = Get-Date -Format yyyyMMdd
+$outputFolder = [System.IO.Path]::GetFullPath($global:pathRoot + "\output\")
+$outputPath = [System.IO.Path]::GetFullPath($global:pathRoot + "\output\" + $output + "-" + $dateTag + ".scad")
+
+New-Item -ItemType Directory -Force -Path $outputFolder
 
 Write-Host "Order of files to compile:"
 foreach ($dep in $dependencies)
@@ -88,3 +92,5 @@ foreach ($dep in $dependencies)
     Write-Host "  " $dep
     Concat-ScadFile $dep $outputPath
 }
+
+Write-Host "Done.  Written to " + $outputPath

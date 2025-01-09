@@ -1,4 +1,4 @@
 *.stl
 *.3mf
 BOSL/**
-output*.scad
+output/**
