@@ -61,7 +61,10 @@ outputFilename=$(echo "$inputFilename" | sed 's/\.[^.]*$//')
 timestamp=$(date +"%Y%m%d")
 outputPath="./output/$outputFilename-$timestamp.scad"
 
+mkdir -p "./output"
+
 sorted=$(printf "%s\n" "${dependencies[@]}" | jq -s 'sort_by(.depth) | reverse | unique_by(.path) | .[].path')
+
 for f in $sorted; do
     unquoted=${f//\"/}
     process_file "$unquoted" "$outputPath"
