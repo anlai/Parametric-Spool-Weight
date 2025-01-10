@@ -1,8 +1,5 @@
 name: Compile and Publish
-on:
-  workflow_dispatch:
-    branches: [compilation]
-
+on: workflow_dispatch
 
 jobs:
   CompileAndPublish:
