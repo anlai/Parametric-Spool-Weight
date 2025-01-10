@@ -1,88 +1,73 @@
 #!/bin/bash
 
 # Parameters
-filename="$1"
-output="${2:-Spool-Weight}"
+inputFile="$1"
+# output="${2:-Spool-Weight}"
 
-echo "Compiling file: $filename"
+echo "Compiling file: $inputFile"
 echo ""
 
 line_pattern='(include|use)\s*<(.+?)>'
 comment_pattern='^\s*//'
 
 pathRoot=$(dirname "$0")
+inputFilename=$(basename "$1")
 dependencies=()
 
-echo "$pathRoot"
+function find_dependencies {
+    local path=$1
+    local file=$2
+    local depth=$3
 
-search_file_dependencies() {
-    local path="$1"
-    local filenames=()
+    local nextDepth=$((depth+1))
 
     while IFS= read -r line; do
-        if [[ "$line" =~ $line_pattern ]] && [[ ! "$line" =~ $comment_pattern ]]; then
-            filenames+=("${BASH_REMATCH[2]}")
-        fi
-    done < "$path"
-
-    echo "${filenames[@]}"
-}
-
-discover_scadfile_dependencies() {
-    local path="$1"
-    local depth="${2:-0}"
-    local root_dir
-    root_dir=$(dirname "$path")
-
-    local deps
-    deps=$(search_file_dependencies "$path")
-    for dep in $deps; do
-        dependencies+=("$(realpath "$pathRoot/$root_dir/$dep"):$((depth + 1))")
-        discover_scadfile_dependencies "$root_dir/$dep" $((depth + 1))
-    done
-}
-
-discover_dependencies() {
-    local path="$1"
-    discover_scadfile_dependencies "$path"
-    printf "%s\n" "${dependencies[@]}" | sort -t: -k2 -nr | cut -d: -f1 | uniq
-}
-
-concat_scadfile() {
-    local path="$1"
-    local outputPath="$2"
-    local name="// $(basename "$path")"
-
-    {
-        echo "// =============="
-        echo "$name"
-        echo "// =============="
-
-        while IFS= read -r line; do
-            if [[ ! "$line" =~ $line_pattern ]]; then
-                echo "$line"
+        if ! [[ $line =~ $comment_pattern ]] && [[ $line =~ $line_pattern ]]; then
+            depFilename="${BASH_REMATCH[2]}"
+            filedir=$(dirname "$depFilename")
+            depFilename=$(basename "$depFilename")
+            if [[ $filedir == "." ]]; then
+                dir="$path"
+            else
+                dir="$path/$filedir"
             fi
-        done < "$path"
-    } >> "$outputPath"
+
+            dependencies+=("{\"path\":\"$dir/$depFilename\",\"depth\":$depth}")
+            find_dependencies $dir $depFilename $nextDepth
+        fi
+    done < "$path/$file"
 }
 
-dependencies=$(discover_dependencies "$filename")
-dependencies+=" $(realpath "$pathRoot/$filename")"
+function process_file {
+    local filepath=$1
+    local outputPath=$2
 
-dateTag=$(date +%Y%m%d)
-outputFolder=$(realpath "$pathRoot/output/")
-outputPath=$(realpath "$pathRoot/output/$output-$dateTag.scad")
+    local srcFilename=$(basename "$filepath")
 
-mkdir -p "$outputFolder"
+    echo "$filepath"
+    echo "$outputPath"
 
-if [[ -f "$outputPath" ]]; then
-    rm "$outputPath"
-fi
+    while IFS= read -r line; do
+        if ! [[ $line =~ $line_pattern ]]; then
+            echo "$line" >> "$outputPath"
+        fi
+    done < "$filepath"
+}
 
-echo "Order of files to compile:"
-for dep in $dependencies; do
-    echo "  $dep"
-    concat_scadfile "$dep" "$outputPath"
+find_dependencies $pathRoot $inputFile 0
+
+echo "==output=="
+outputFilename=$(echo "$inputFilename" | sed 's/\.[^.]*$//')
+timestamp=$(date +"%Y%m%d")
+outputPath="./output/$outputFilename-$timestamp.scad"
+
+sorted=$(printf "%s\n" "${dependencies[@]}" | jq -s 'sort_by(.depth) | reverse | unique_by(.path) | .[].path')
+for f in $sorted; do
+    unquoted=${f//\"/}
+    process_file "$unquoted" "$outputPath"
 done
 
-echo "Done. Written to $outputPath"
+process_file "$inputFile" "$outputPath"
+
+echo "result written to: $outputPath"
+echo "done"
