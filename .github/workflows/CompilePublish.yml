@@ -30,7 +30,11 @@ jobs:
         ls output
         echo ${{ steps.date.outputs.date }}
 
-        cp output/* ../
+        echo "====="
+        cd output
+        mv *.scad ../
+        cd ../
+        echo "====="
         ls
     - name: Release
       uses: softprops/action-gh-release@v2
