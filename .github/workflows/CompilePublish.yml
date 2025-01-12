@@ -25,17 +25,17 @@ jobs:
     - name: Get current date
       id: date
       run: echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
-    - name: Debug
-      run: |
-        ls output
-        echo ${{ steps.date.outputs.date }}
+    # - name: Debug
+    #   run: |
+    #     ls output
+    #     echo ${{ steps.date.outputs.date }}
 
-        echo "====="
-        cd output
-        mv *.scad ../
-        cd ../
-        echo "====="
-        ls
+    #     echo "====="
+    #     cd output
+    #     mv *.scad ../
+    #     cd ../
+    #     echo "====="
+    #     ls
     - name: Release
       uses: softprops/action-gh-release@v2
       with:
