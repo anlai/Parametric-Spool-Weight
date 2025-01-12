@@ -23,6 +23,8 @@ jobs:
         run: |
           ls
 
+          ./setup.sh
+
       # # Runs a single command using the runners shell
       # - name: Setup BOSL
       #   run: setup.sh
