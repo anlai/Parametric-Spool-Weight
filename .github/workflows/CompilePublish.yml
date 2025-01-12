@@ -33,7 +33,7 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: |
-          output\Spool-Weight-${{ steps.date.outputs.date }}.scad
+          output\
 
 
 
