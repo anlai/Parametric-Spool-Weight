@@ -29,9 +29,8 @@ jobs:
 
       - name: Debug
         run: |
-          ls
-
-          ./setup.sh
+          ./compile.sh Spool-Weight.scad
+          ls output
 
       # # Runs a single command using the runners shell
       # - name: Setup BOSL
