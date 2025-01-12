@@ -26,7 +26,9 @@ jobs:
       id: date
       run: echo "date=:$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
     - name: Debug
-      run: ls output
+      run: |
+        ls output
+        echo ${{ steps.date.outputs.date }}
     - name: Release
       uses: softprops/action-gh-release@v2
       with:
