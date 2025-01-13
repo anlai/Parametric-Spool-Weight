@@ -18,5 +18,5 @@ jobs:
     - name: Tag New Version
       uses: mathieudutour/github-tag-action@v6.2
       with:
-        custom_tag: v${{ steps.date.outputs.date }}
+        custom_tag: ${{ steps.date.outputs.date }}
         github_token: ${{ secrets.GITHUB_TOKEN }}
