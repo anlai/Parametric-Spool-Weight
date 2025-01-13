@@ -3,8 +3,11 @@ name: Publish
 on:
   workflow_dispatch:
   push:
-    tags:
-      - v*
+    branches:
+      - master
+  # push:
+  #   tags:
+  #     - "v*.*"
 
 jobs:
   build:
@@ -25,8 +28,14 @@ jobs:
     - name: Get current date
       id: date
       run: echo "date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+    - name: Tag New Version
+      uses: mathieudutour/github-tag-action@v6.2
+      with:
+        custom_tag: ${{ steps.date.outputs.date }}
+        github_token: ${{ secrets.GITHUB_TOKEN }}
     - name: Release
       uses: softprops/action-gh-release@v2
       with:
+        tag_name: "v${{ steps.date.outputs.date }}"
         files: |
           Spool-Weight-${{ steps.date.outputs.date }}.scad
