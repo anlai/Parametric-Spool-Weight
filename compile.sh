@@ -45,13 +45,13 @@ function process_file {
 
     local srcFilename=$(basename "$filepath")
 
-    echo "======" >> "$outputPath"
+    echo "// ======" >> "$outputPath"
     if [[ $customizer == true ]]; then    
-        echo "$srcFilename -- parameters" >> "$outputPath"
+        echo "// $srcFilename -- parameters" >> "$outputPath"
     else
-        echo "$srcFilename" >> "$outputPath"
+        echo "// $srcFilename" >> "$outputPath"
     fi
-    echo "======" >> "$outputPath"
+    echo "// ======" >> "$outputPath"
 
     local write=$customizer
 
