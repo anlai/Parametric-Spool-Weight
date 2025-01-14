@@ -20,6 +20,8 @@ weight_diameter = 14.5;
 // height of the weight(s)
 weight_height = 50.5;
 
+module __Customizer_Limit__ () {}
+
 /* [Hidden] */
 wall_thickness = 2;
 cap_diameter_add = 15;

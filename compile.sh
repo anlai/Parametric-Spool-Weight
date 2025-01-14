@@ -41,14 +41,34 @@ function find_dependencies {
 function process_file {
     local filepath=$1
     local outputPath=$2
+    local customizer=$3
 
     local srcFilename=$(basename "$filepath")
 
-    echo "$filepath"
-    echo "$outputPath"
+    echo "======" >> "$outputPath"
+    if [[ $customizer == true ]]; then    
+        echo "$srcFilename -- parameters" >> "$outputPath"
+    else
+        echo "$srcFilename" >> "$outputPath"
+    fi
+    echo "======" >> "$outputPath"
+
+    local write=$customizer
+
+    if [[ $customizer == false ]] && ! grep -q "module __Customizer_Limit__ () {}" "$filepath"; then
+        write=true
+    fi
 
     while IFS= read -r line; do
-        if ! [[ $line =~ $line_pattern ]]; then
+        if [[ $customizer == true ]] && [[ $line == "module __Customizer_Limit__ () {}" ]]; then
+            echo "$line" >> "$outputPath"
+            break
+        elif [[ $customizer == false ]] && [[ $line == "module __Customizer_Limit__ () {}" ]]; then
+            write=true
+            continue
+        fi
+
+        if ! [[ $line =~ $line_pattern ]] && [[ $write == true ]]; then
             echo "$line" >> "$outputPath"
         fi
     done < "$filepath"
@@ -63,12 +83,12 @@ outputPath="$outputFilename-$timestamp.scad"
 
 sorted=$(printf "%s\n" "${dependencies[@]}" | jq -s 'sort_by(.depth) | reverse | unique_by(.path) | .[].path')
 
+process_file "$inputFile" "$outputPath" true
 for f in $sorted; do
     unquoted=${f//\"/}
-    process_file "$unquoted" "$outputPath"
+    process_file "$unquoted" "$outputPath" false
 done
-
-process_file "$inputFile" "$outputPath"
+process_file "$inputFile" "$outputPath" false
 
 echo "result written to: $outputPath"
 echo "done"
