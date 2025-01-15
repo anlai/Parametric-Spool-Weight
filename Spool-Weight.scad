@@ -26,6 +26,15 @@ cap_edge_grip_num = 50;
 // size of cirlces on cap edges
 cap_edge_grip_diameter = 15;
 
+// include recessed finger grip
+cap_finger_grip = true;
+
+// scaling factor based on cap diameter
+cap_handle_depth_factor = .1; // [.1:0.1:.5]
+
+// scaling factor based on cap diameter
+cap_handle_size_factor = .75; // [.5:.05:1]
+
 module __Customizer_Limit__ () {}
 
 /* [Hidden] */
@@ -63,6 +72,7 @@ module endcap() {
     cylinder(d=cap_diameter, h=wall_thickness, $fn=360);    
     cap_edging(cap_edge_grip_num,cap_diameter/2,cap_edge_grip_diameter);
 
+    color("black")
     translate([0,0,wall_thickness])
     linear_extrude(.01)
     text(text=label,font="Arial,style=bold",halign="center",valign="center");
@@ -122,6 +132,28 @@ module cap() {
     endcap();
 }
 
+module finger_grip() {
+    difference() {
+        vertical_scale=.1;
+        scale([.75,.75,vertical_scale])
+        sphere(d=cap_diameter,$fn=360);
+
+        translate([0,0,-(cap_diameter*vertical_scale)/4])
+        cube([cap_diameter, cap_diameter, (cap_diameter*vertical_scale)/2],center=true);
+        
+        cube([cap_diameter, cap_diameter/3, cap_diameter],center=true);
+    }
+}
+
+
 body();
 
-translate([cap_diameter+8+cap_edge_grip_diameter,0,0]) cap();
+translate([cap_diameter+8+cap_edge_grip_diameter,0,0])
+difference() {
+    cap();
+
+    if (cap_finger_grip) {
+        translate([0,0,-wall_thickness])
+        finger_grip();
+    }
+}

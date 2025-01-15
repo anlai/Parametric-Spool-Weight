@@ -18,9 +18,11 @@
             "weight_height": "50.5"
         },
         "New set 1": {
-            "cap_edge_grip_diameter": "25",
-            "cap_edge_grip_num": "10",
-            "label": "",
+            "cap_edge_grip_diameter": "5",
+            "cap_edge_grip_num": "50",
+            "cap_handle_depth_factor": "0.10000000000000001",
+            "cap_handle_size_factor": "0.75",
+            "label": "bambu lab",
             "num_weights": "7",
             "spool_diameter": "72",
             "spool_thickness": "62",
